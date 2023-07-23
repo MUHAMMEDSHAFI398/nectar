@@ -20,21 +20,20 @@ const UploadFile = () => {
   const phoneErrors: number[] = [];
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    
     const file = event.target.files?.[0];
     if (file) {
-        const isCSV = file.name.toLowerCase().endsWith('.csv');
-        if (isCSV) {
-            Papa.parse(file, {
-                complete: (result: Papa.ParseResult<any>) => {
-                  setCsvData(result.data);
-                },
-                header: true,
-              });
-        }else{
-            message.error("Please select a csv file")
-        }
-    
+      const isCSV = file.name.toLowerCase().endsWith(".csv");
+      if (isCSV) {
+        Papa.parse(file, {
+          complete: (result: Papa.ParseResult<any>) => {
+            setCsvData(result.data);
+          },
+          header: true,
+        });
+      } else {
+        event.target.value = "";
+        message.error("Please select a csv file");
+      }
     }
   };
 
@@ -64,47 +63,47 @@ const UploadFile = () => {
     setPhoneValidationErrors(phoneErrors);
     setTableData(true);
   };
-  const handleNameChange =
-    (phone: number) => (e: ChangeEvent<HTMLInputElement>) => {
+
+  const handleFieldChange =
+    (phone: number, field: "name" | "phone" | "address") =>
+    (e: ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       if (csvData) {
         const updatedData = csvData.map((data) =>
-          data.phone === phone ? { ...data, name: value } : data
+          data.phone === phone ? { ...data, [field]: value } : data
         );
 
-        const updatedNameErrors: number[] = [];
-        updatedData.forEach((data, rowIndex) => {
-          const nameValid = isNameValid(data.name);
-
-          if (!nameValid) {
-            updatedNameErrors.push(rowIndex);
-          }
-        });
-
-        setCsvData(updatedData);
-        setNameValidationErrors(updatedNameErrors);
-      }
-    };
-
-  const handleNumberChange =
-    (phone: number) => (e: ChangeEvent<HTMLInputElement>) => {
-      const { value } = e.target;
-      if (csvData) {
-        const updatedData = csvData.map((data) =>
-          data.phone === phone ? { ...data, phone: value } : data
-        );
-
-        const updatedPhoneErrors: number[] = [];
-        updatedData.forEach((data, rowIndex) => {
-          const phoneValid = isIndianPhoneNumberValid(data.phone);
-
-          if (!phoneValid) {
-            updatedPhoneErrors.push(rowIndex);
-          }
-        });
+        let updatedValidationErrors: number[] = [];
+        if (field === "name") {
+          updatedValidationErrors = updatedData.reduce(
+            (errors, data, rowIndex) => {
+              const nameValid = isNameValid(data.name);
+              if (!nameValid) {
+                errors.push(rowIndex);
+              }
+              return errors;
+            },
+            [] as number[]
+          );
+        } else if (field === "phone") {
+          updatedValidationErrors = updatedData.reduce(
+            (errors, data, rowIndex) => {
+              const phoneValid = isIndianPhoneNumberValid(data.phone);
+              if (!phoneValid) {
+                errors.push(rowIndex);
+              }
+              return errors;
+            },
+            [] as number[]
+          );
+        }
 
         setCsvData(updatedData);
-        setPhoneValidationErrors(updatedPhoneErrors);
+        if (field === "name") {
+          setNameValidationErrors(updatedValidationErrors);
+        } else if (field === "phone") {
+          setPhoneValidationErrors(updatedValidationErrors);
+        }
       }
     };
 
@@ -147,8 +146,8 @@ const UploadFile = () => {
       }).then((result) => {
         message.info("Please review and update the fields highlighted in red");
       });
-    }else{
-        downloadCSV(csvData ? csvData : [], 'data.csv');
+    } else {
+      downloadCSV(csvData ? csvData : [], "data.csv");
     }
   };
 
@@ -213,7 +212,7 @@ const UploadFile = () => {
                         type="text"
                         name="name"
                         value={data.name}
-                        onChange={handleNameChange(data.phone)}
+                        onChange={handleFieldChange(data.phone, "name")}
                         className={`w-full bg-transparent focus:outline-none ${
                           nameValidationErrors.includes(rowIndex)
                             ? "text-red-600"
@@ -232,7 +231,7 @@ const UploadFile = () => {
                         type="text"
                         name="phone"
                         value={data.phone}
-                        onChange={handleNumberChange(data.phone)}
+                        onChange={handleFieldChange(data.phone, "phone")}
                         className={`w-full bg-transparent focus:outline-none ${
                           phoneValidationErrors.includes(rowIndex)
                             ? "text-red-600"
@@ -243,7 +242,9 @@ const UploadFile = () => {
                     <td className="border px-4 py-2">
                       <input
                         type="text"
+                        name="address"
                         value={data.address}
+                        onChange={handleFieldChange(data.phone, "address")}
                         className="w-full bg-transparent focus:outline-none"
                       />
                     </td>
