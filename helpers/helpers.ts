@@ -1,8 +1,9 @@
 import Papa from 'papaparse';
 
 function downloadCSV(data: any[], filename: string): void {
-  const dataWithSlNo = data.map((item, index) => ({ ...item, slno: index + 1 }));
-  const csv = Papa.unparse(dataWithSlNo); // Use dataWithSlNo instead of data
+  console.log(data);
+  
+  const csv = Papa.unparse(data); 
   const csvData = new Blob([csv], { type: 'text/csv' });
   const csvUrl = URL.createObjectURL(csvData);
   const hiddenElement = document.createElement('a');
