@@ -20,14 +20,21 @@ const UploadFile = () => {
   const phoneErrors: number[] = [];
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    
     const file = event.target.files?.[0];
     if (file) {
-      Papa.parse(file, {
-        complete: (result: Papa.ParseResult<any>) => {
-          setCsvData(result.data);
-        },
-        header: true,
-      });
+        const isCSV = file.name.toLowerCase().endsWith('.csv');
+        if (isCSV) {
+            Papa.parse(file, {
+                complete: (result: Papa.ParseResult<any>) => {
+                  setCsvData(result.data);
+                },
+                header: true,
+              });
+        }else{
+            message.error("Please select a csv file")
+        }
+    
     }
   };
 
