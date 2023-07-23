@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent, FormEventHandler } from "react";
+import React, { useState, ChangeEvent } from "react";
 import Papa from "papaparse";
 import isNameValid from "@/validation/NameValidation";
 import isIndianPhoneNumberValid from "@/validation/NumbarValidation";
@@ -16,8 +16,6 @@ const UploadFile = () => {
   const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>(
     []
   );
-  const nameErrors: number[] = [];
-  const phoneErrors: number[] = [];
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,6 +27,10 @@ const UploadFile = () => {
             setCsvData(result.data);
           },
           header: true,
+          error: (error) => {
+            console.error("CSV parsing error:", error);
+            message.error("Error occurred while parsing the CSV file.");
+          },
         });
       } else {
         event.target.value = "";
@@ -48,19 +50,16 @@ const UploadFile = () => {
 
         // If the Name is invalid, add the rowIndex to the nameErrors array
         if (!nameValid) {
-          nameErrors.push(rowIndex);
+          setNameValidationErrors([...nameValidationErrors, rowIndex]);
         }
 
         // If the Phone Number is invalid, add the rowIndex to the phoneErrors array
         if (!phoneValid) {
-          phoneErrors.push(rowIndex);
+          setPhoneValidationErrors([...phoneValidationErrors, rowIndex]);
         }
       });
     }
 
-    // Update the state with the validation errors
-    setNameValidationErrors(nameErrors);
-    setPhoneValidationErrors(phoneErrors);
     setTableData(true);
   };
 
@@ -144,7 +143,11 @@ const UploadFile = () => {
         confirmButtonColor: "green",
         confirmButtonText: "OK",
       }).then((result) => {
-        message.info("Please review and update the fields highlighted in red");
+        if (result.isConfirmed) {
+          message.info(
+            "Please review and update the fields highlighted in red"
+          );
+        }
       });
     } else {
       downloadCSV(csvData ? csvData : [], "data.csv");
