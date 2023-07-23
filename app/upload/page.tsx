@@ -16,6 +16,8 @@ const UploadFile = () => {
   const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>(
     []
   );
+  const nameErrors: number[] = [];
+  const phoneErrors: number[] = [];
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -50,16 +52,19 @@ const UploadFile = () => {
 
         // If the Name is invalid, add the rowIndex to the nameErrors array
         if (!nameValid) {
-          setNameValidationErrors([...nameValidationErrors, rowIndex]);
+          nameErrors.push(rowIndex);
         }
 
         // If the Phone Number is invalid, add the rowIndex to the phoneErrors array
         if (!phoneValid) {
-          setPhoneValidationErrors([...phoneValidationErrors, rowIndex]);
+          phoneErrors.push(rowIndex);
         }
       });
     }
 
+    // Update the state with the validation errors
+    setNameValidationErrors(nameErrors);
+    setPhoneValidationErrors(phoneErrors);
     setTableData(true);
   };
 
