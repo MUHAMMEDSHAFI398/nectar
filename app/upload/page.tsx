@@ -128,8 +128,8 @@ const UploadFile = () => {
         <ul style="list-style-type: disc; margin-left: 20px;">
         <p style="font-weight: bold; margin-bottom: 20px;">Please update the fields highlighted in red:</p>
           <li>Name should not start with a number</li>
-          <li>Name Should not contain any special characters</li>
-          <li>NameShould contain a minimum of 3 characters</li>
+          <li>Name should not contain any special characters</li>
+          <li>Name should contain a minimum of 3 characters</li>
           <li>Phone number should be a valid Indian phone number</li>
         </ul>
       </div>
