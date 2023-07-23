@@ -16,9 +16,9 @@ function WelcomeSection() {
       } else {
         clearInterval(intervalId);
       }
-    }, 100); // Adjust the interval value (in milliseconds) to control the speed of animation
+    }, 100); 
 
-    return () => clearInterval(intervalId); // Clear the interval on component unmount
+    return () => clearInterval(intervalId); 
   }, []);
 
   return (
