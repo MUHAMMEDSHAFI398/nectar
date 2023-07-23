@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -24,4 +24,33 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+} */
+
+
+body {
+  background-image: url('/bg.avif');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
+
+
+/* LetterAnimation.css */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.letter-animation {
+  animation: fadeIn 0.5s ease-in-out; /* Adjust the animation duration as needed */
+}
+
+
+
+
+
+
+
