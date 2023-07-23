@@ -8,16 +8,11 @@ import Swal from "sweetalert2";
 import { message } from "antd";
 
 const UploadFile = () => {
+
   const [tableData, setTableData] = useState<boolean>(false);
   const [csvData, setCsvData] = useState<any[] | null>(null);
-  const [nameValidationErrors, setNameValidationErrors] = useState<number[]>(
-    []
-  );
-  const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>(
-    []
-  );
-  const nameErrors: number[] = [];
-  const phoneErrors: number[] = [];
+  const [nameValidationErrors, setNameValidationErrors] = useState<number[]>([]);
+  const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -52,19 +47,14 @@ const UploadFile = () => {
 
         // If the Name is invalid, add the rowIndex to the nameErrors array
         if (!nameValid) {
-          nameErrors.push(rowIndex);
+          setNameValidationErrors((prevErrors) => [...prevErrors, rowIndex]);
         }
-
         // If the Phone Number is invalid, add the rowIndex to the phoneErrors array
         if (!phoneValid) {
-          phoneErrors.push(rowIndex);
+          setPhoneValidationErrors((prevErrors) => [...prevErrors, rowIndex]);
         }
       });
     }
-
-    // Update the state with the validation errors
-    setNameValidationErrors(nameErrors);
-    setPhoneValidationErrors(phoneErrors);
     setTableData(true);
   };
 
@@ -129,6 +119,7 @@ const UploadFile = () => {
       }
     });
   };
+  
   const handleDownload = () => {
     if (phoneValidationErrors.length || nameValidationErrors.length) {
       Swal.fire({
