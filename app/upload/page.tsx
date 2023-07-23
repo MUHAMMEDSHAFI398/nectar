@@ -3,6 +3,7 @@ import React, { useState, ChangeEvent, FormEventHandler } from "react";
 import Papa from "papaparse";
 import isNameValid from "@/validation/NameValidation";
 import isIndianPhoneNumberValid from "@/validation/NumbarValidation";
+import downloadCSV from "@/helpers/helpers";
 import Swal from "sweetalert2";
 import { message } from "antd";
 
@@ -28,7 +29,6 @@ const UploadFile = () => {
         header: true,
       });
     }
-    console.log(csvData);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,9 +119,34 @@ const UploadFile = () => {
       }
     });
   };
+  const handleDownload = () => {
+    if (phoneValidationErrors.length || nameValidationErrors.length) {
+      Swal.fire({
+        html: `
+      <div style="text-align: left;">
+      
+        <ul style="list-style-type: disc; margin-left: 20px;">
+        <p style="font-weight: bold; margin-bottom: 20px;">Please update the fields highlighted in red:</p>
+          <li>Name should not start with a number</li>
+          <li>Name Should not contain any special characters</li>
+          <li>NameShould contain a minimum of 3 characters</li>
+          <li>Phone number should be a valid Indian phone number</li>
+        </ul>
+      </div>
+    `,
+        icon: "warning",
+        confirmButtonColor: "green",
+        confirmButtonText: "OK",
+      }).then((result) => {
+        message.info("Please review and update the fields highlighted in red");
+      });
+    }else{
+        downloadCSV(csvData ? csvData : [], 'data.csv');
+    }
+  };
 
   return (
-    <div className="mt-[40px]">
+    <div className="mt-[10px]">
       <div className="flex justify-center">
         <p className=" text-4xl font-bold">Upload a CSV file</p>
       </div>
@@ -140,6 +165,18 @@ const UploadFile = () => {
             Submit
           </button>
         </form>
+      </div>
+      <div className="ms-5">
+        {tableData ? (
+          <button
+            onClick={handleDownload}
+            className=" h-10 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded"
+          >
+            Download
+          </button>
+        ) : (
+          <p></p>
+        )}
       </div>
       <div className="p-5">
         <div className="overflow-x-auto">
