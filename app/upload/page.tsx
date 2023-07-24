@@ -9,7 +9,7 @@ import { message } from "antd";
 
 const UploadFile = () => {
   const [tableData, setTableData] = useState<boolean>(false);
-  const [csvData, setCsvData] = useState<any[] | null>(null);
+  const [csvData, setCsvData] = useState<any[]>([]);
   const [nameValidationErrors, setNameValidationErrors] = useState<number[]>(
     []
   );
@@ -18,6 +18,7 @@ const UploadFile = () => {
   );
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCsvData([]);
     const file = event.target.files?.[0];
     if (file) {
       const isCSV = file.name.toLowerCase().endsWith(".csv");
@@ -49,11 +50,11 @@ const UploadFile = () => {
         const phoneValid = isIndianPhoneNumberValid(data.Number);
 
         // If the Name is invalid, add the rowIndex to the nameErrors array
-        if (!nameValid) {
+        if (!nameValid.valid) {
           setNameValidationErrors((prevErrors) => [...prevErrors, rowIndex]);
         }
         // If the Phone Number is invalid, add the rowIndex to the phoneErrors array
-        if (!phoneValid) {
+        if (!phoneValid.valid) {
           setPhoneValidationErrors((prevErrors) => [...prevErrors, rowIndex]);
         }
       });
@@ -75,7 +76,7 @@ const UploadFile = () => {
           updatedValidationErrors = updatedData.reduce(
             (errors, data, rowIndex) => {
               const nameValid = isNameValid(data.Name);
-              if (!nameValid) {
+              if (!nameValid.valid) {
                 errors.push(rowIndex);
               }
               return errors;
@@ -86,7 +87,7 @@ const UploadFile = () => {
           updatedValidationErrors = updatedData.reduce(
             (errors, data, rowIndex) => {
               const phoneValid = isIndianPhoneNumberValid(data.Number);
-              if (!phoneValid) {
+              if (!phoneValid.valid) {
                 errors.push(rowIndex);
               }
               return errors;
@@ -122,6 +123,29 @@ const UploadFile = () => {
       }
     });
   };
+  const handleAddRow = () => {
+    const updated = [...csvData, { Name: "", Number: "", Address: "" }];
+    setCsvData(updated);
+    let updatedNameValidationErrors: number[] = [];
+    updatedNameValidationErrors = updated.reduce((errors, data, rowIndex) => {
+      const nameValid = isNameValid(data.Name);
+      if (!nameValid.valid) {
+        errors.push(rowIndex);
+      }
+      return errors;
+    }, [] as number[]);
+    let updatedPhoneValidationErrors: number[] = [];
+    updatedPhoneValidationErrors = updated.reduce((errors, data, rowIndex) => {
+      const phoneValid = isIndianPhoneNumberValid(data.Number);
+      if (!phoneValid.valid) {
+        errors.push(rowIndex);
+      }
+      return errors;
+    }, [] as number[]);
+    setNameValidationErrors(updatedNameValidationErrors);
+    setPhoneValidationErrors(updatedPhoneValidationErrors);
+    setTableData(true);
+  };
 
   const handleDownload = () => {
     if (phoneValidationErrors.length || nameValidationErrors.length) {
@@ -152,6 +176,10 @@ const UploadFile = () => {
       downloadCSV(csvData ? csvData : [], "data.csv");
     }
   };
+  const handleDleteAll = () => {
+    setCsvData([]);
+    setTableData(false);
+  };
 
   return (
     <div className="mt-[10px]">
@@ -164,7 +192,12 @@ const UploadFile = () => {
           className="flex items-center space-x-4 mt-5"
         >
           <div className="border border-gray-300 bg-slate-500 h-10 rounded flex items-center">
-            <input type="file" accept="text/csv" onChange={handleFileChange} />
+            <input
+              type="file"
+              required
+              accept="text/csv"
+              onChange={handleFileChange}
+            />
           </div>
           <button
             type="submit"
@@ -174,19 +207,35 @@ const UploadFile = () => {
           </button>
         </form>
       </div>
-      <div className="ms-5">
-        {tableData ? (
-          <button
-            onClick={handleDownload}
-            className=" h-10 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded"
-          >
-            Download
-          </button>
-        ) : (
-          <p></p>
-        )}
+      <div className="ms-5 me-5">
+        <div className="flex justify-between">
+          <div>
+            {tableData ? (
+              <button
+                onClick={handleDownload}
+                className=" h-10 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded"
+              >
+                Download
+              </button>
+            ) : (
+              <p></p>
+            )}
+          </div>
+          <div>
+            {tableData ? (
+              <button
+                onClick={handleDleteAll}
+                className=" h-10 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded"
+              >
+                Delete all
+              </button>
+            ) : (
+              <p></p>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="p-5">
+      <div className="ms-5 me-5 mt-3">
         <div className="overflow-x-auto">
           <table className="w-full table-auto bg-white">
             <thead>
@@ -221,6 +270,11 @@ const UploadFile = () => {
                             : ""
                         }`}
                       />
+                      {nameValidationErrors.includes(rowIndex) && (
+                        <p className="text-red-500 text-xs">
+                          {isNameValid(data.Name).message}
+                        </p>
+                      )}
                     </td>
                     <td
                       className={`border px-4 py-2 ${
@@ -240,6 +294,11 @@ const UploadFile = () => {
                             : ""
                         }`}
                       />
+                      {phoneValidationErrors.includes(rowIndex) && (
+                        <p className="text-red-500 text-xs">
+                          {isIndianPhoneNumberValid(data.Number).message}
+                        </p>
+                      )}
                     </td>
                     <td className="border px-4 py-2">
                       <input
@@ -265,6 +324,18 @@ const UploadFile = () => {
               )}
             </tbody>
           </table>
+          <div className="flex justify-end mt-5">
+            {tableData ? (
+              <button
+                onClick={handleAddRow}
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Addrow
+              </button>
+            ) : (
+              <p></p>
+            )}
+          </div>
         </div>
       </div>
     </div>
