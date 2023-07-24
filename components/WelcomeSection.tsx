@@ -16,23 +16,25 @@ function WelcomeSection() {
       } else {
         clearInterval(intervalId);
       }
-    }, 100); 
+    }, 100);
 
-    return () => clearInterval(intervalId); 
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
     <div>
       <div className="flex justify-center">
-        <p className="text-white text-9xl font-bold mb-[200px]">{displayText}</p>
+        <p className="text-white text-9xl font-bold mb-8 sm:mb-16 md:text-7xl lg:text-9xl">
+          {displayText}
+        </p>
       </div>
+
       <div className="flex justify-center mb-5">
         <Link href="/upload">
-        <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-          Click here
-        </button>
+          <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Click here
+          </button>
         </Link>
-      
       </div>
     </div>
   );
