@@ -8,11 +8,14 @@ import Swal from "sweetalert2";
 import { message } from "antd";
 
 const UploadFile = () => {
-
   const [tableData, setTableData] = useState<boolean>(false);
   const [csvData, setCsvData] = useState<any[] | null>(null);
-  const [nameValidationErrors, setNameValidationErrors] = useState<number[]>([]);
-  const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>([]);
+  const [nameValidationErrors, setNameValidationErrors] = useState<number[]>(
+    []
+  );
+  const [phoneValidationErrors, setPhoneValidationErrors] = useState<number[]>(
+    []
+  );
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,8 +45,8 @@ const UploadFile = () => {
     // Validate each row in the csvData array
     if (csvData) {
       csvData.forEach((data, rowIndex) => {
-        const nameValid = isNameValid(data.name);
-        const phoneValid = isIndianPhoneNumberValid(data.phone);
+        const nameValid = isNameValid(data.Name);
+        const phoneValid = isIndianPhoneNumberValid(data.Number);
 
         // If the Name is invalid, add the rowIndex to the nameErrors array
         if (!nameValid) {
@@ -59,19 +62,19 @@ const UploadFile = () => {
   };
 
   const handleFieldChange =
-    (phone: number, field: "name" | "phone" | "address") =>
+    (rowIndex: number, field: "Name" | "Number" | "Address") =>
     (e: ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       if (csvData) {
-        const updatedData = csvData.map((data) =>
-          data.phone === phone ? { ...data, [field]: value } : data
+        const updatedData = csvData.map((data, rowNumber) =>
+          rowNumber === rowIndex ? { ...data, [field]: value } : data
         );
 
         let updatedValidationErrors: number[] = [];
-        if (field === "name") {
+        if (field === "Name") {
           updatedValidationErrors = updatedData.reduce(
             (errors, data, rowIndex) => {
-              const nameValid = isNameValid(data.name);
+              const nameValid = isNameValid(data.Name);
               if (!nameValid) {
                 errors.push(rowIndex);
               }
@@ -79,10 +82,10 @@ const UploadFile = () => {
             },
             [] as number[]
           );
-        } else if (field === "phone") {
+        } else if (field === "Number") {
           updatedValidationErrors = updatedData.reduce(
             (errors, data, rowIndex) => {
-              const phoneValid = isIndianPhoneNumberValid(data.phone);
+              const phoneValid = isIndianPhoneNumberValid(data.Number);
               if (!phoneValid) {
                 errors.push(rowIndex);
               }
@@ -93,9 +96,9 @@ const UploadFile = () => {
         }
 
         setCsvData(updatedData);
-        if (field === "name") {
+        if (field === "Name") {
           setNameValidationErrors(updatedValidationErrors);
-        } else if (field === "phone") {
+        } else if (field === "Number") {
           setPhoneValidationErrors(updatedValidationErrors);
         }
       }
@@ -112,14 +115,14 @@ const UploadFile = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         if (csvData) {
-          const updated = csvData.filter((data) => data.phone !== id);
+          const updated = csvData.filter((data, rowNumber) => rowNumber !== id);
           setCsvData(updated);
         }
         message.success("Successfully deleted");
       }
     });
   };
-  
+
   const handleDownload = () => {
     if (phoneValidationErrors.length || nameValidationErrors.length) {
       Swal.fire({
@@ -209,9 +212,9 @@ const UploadFile = () => {
                     >
                       <input
                         type="text"
-                        name="name"
-                        value={data.name}
-                        onChange={handleFieldChange(data.phone, "name")}
+                        name="Name"
+                        value={data.Name}
+                        onChange={handleFieldChange(rowIndex, "Name")}
                         className={`w-full bg-transparent focus:outline-none ${
                           nameValidationErrors.includes(rowIndex)
                             ? "text-red-600"
@@ -228,9 +231,9 @@ const UploadFile = () => {
                     >
                       <input
                         type="text"
-                        name="phone"
-                        value={data.phone}
-                        onChange={handleFieldChange(data.phone, "phone")}
+                        name="Number"
+                        value={data.Number}
+                        onChange={handleFieldChange(rowIndex, "Number")}
                         className={`w-full bg-transparent focus:outline-none ${
                           phoneValidationErrors.includes(rowIndex)
                             ? "text-red-600"
@@ -241,15 +244,15 @@ const UploadFile = () => {
                     <td className="border px-4 py-2">
                       <input
                         type="text"
-                        name="address"
-                        value={data.address}
-                        onChange={handleFieldChange(data.phone, "address")}
+                        name="Address"
+                        value={data.Address}
+                        onChange={handleFieldChange(rowIndex, "Address")}
                         className="w-full bg-transparent focus:outline-none"
                       />
                     </td>
                     <td className="border px-4 py-2">
                       <button
-                        onClick={(e) => handleDelete(data.phone)}
+                        onClick={(e) => handleDelete(rowIndex)}
                         className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
                       >
                         Delete
