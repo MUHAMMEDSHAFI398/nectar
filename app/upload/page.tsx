@@ -189,6 +189,8 @@ const UploadFile = () => {
       if(result.isConfirmed){
         setCsvData([]);
         setTableData(false);
+        const inputElement = document.getElementById('fileInput') as HTMLInputElement;
+        inputElement.value = '';
       }
     })
   };
@@ -208,6 +210,7 @@ const UploadFile = () => {
               type="file"
               required
               accept="text/csv"
+              id="fileInput"
               onChange={handleFileChange}
             />
           </div>
