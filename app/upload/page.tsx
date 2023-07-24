@@ -177,8 +177,20 @@ const UploadFile = () => {
     }
   };
   const handleDleteAll = () => {
-    setCsvData([]);
-    setTableData(false);
+    Swal.fire({
+
+      text: "Are you sure you want to delete all data?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'green',
+      cancelButtonColor: 'red',
+      confirmButtonText: 'Yes'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        setCsvData([]);
+        setTableData(false);
+      }
+    })
   };
 
   return (
