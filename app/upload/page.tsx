@@ -191,6 +191,8 @@ const UploadFile = () => {
         setTableData(false);
         const inputElement = document.getElementById('fileInput') as HTMLInputElement;
         inputElement.value = '';
+        setNameValidationErrors([])
+        setPhoneValidationErrors([])
       }
     })
   };
